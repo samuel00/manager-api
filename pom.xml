@@ -10,6 +10,7 @@
 	<modules>
 		<module>listener-api</module>
 		<module>listener-aspect</module>
+		<module>listener-core</module>
 	</modules>
 	
 	<properties>
