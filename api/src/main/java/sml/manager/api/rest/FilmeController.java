@@ -1,4 +1,4 @@
-package org.learn.log.rest;
+package sml.manager.api.rest;
 
 import java.text.ParseException;
 
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import sls.listener.core.entidade.FilmeDTO;
+import sml.manager.api.core.entidade.FilmeDTO;
 
 /**
  * Handles requests for the application home page.
@@ -33,7 +33,7 @@ public class FilmeController {
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public ResponseEntity<Void> salvarFilme(@RequestBody @Validated FilmeDTO filme,
+	public String salvarFilme(@RequestBody @Validated FilmeDTO filme,
 			HttpServletRequest request)  throws ParseException {
 
 		JSONObject json = new JSONObject();
@@ -43,7 +43,7 @@ public class FilmeController {
 
 		HttpHeaders headers = new HttpHeaders();
         headers.setConnection("");
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        return json.toString();
 	}
 
 	@RequestMapping(value = "/id", method = RequestMethod.GET)

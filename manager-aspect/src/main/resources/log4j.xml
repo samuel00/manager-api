@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="org.learn.log">
+	<logger name="sml.manager.api">
 		<level value="trace" />
 	</logger>
 	

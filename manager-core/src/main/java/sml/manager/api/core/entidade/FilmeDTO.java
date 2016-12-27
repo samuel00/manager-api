@@ -1,4 +1,4 @@
-package sls.listener.core.entidade;
+package sml.manager.api.core.entidade;
 
 public class FilmeDTO {
 	

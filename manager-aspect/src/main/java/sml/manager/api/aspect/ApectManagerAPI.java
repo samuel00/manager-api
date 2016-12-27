@@ -1,4 +1,4 @@
-package org.learn.log.aspect;
+package sml.manager.api.aspect;
 
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -39,44 +39,40 @@ public class ApectManagerAPI {
 	@Pointcut("execution(* *.*(..))")
 	protected void loggingAllOperation() {
 	}
-
-	/*@Pointcut("within(org.learn.log..*)")
-	private void logAnyFunctionWithinResource() {
-	}*/
-
+	
 	@Before("restController() && allMethod() && args(..,request)")
 	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) {
 
-		log.info("Entering in Method :  " + joinPoint.getSignature().getName());
-		log.info("Class Name :  " + joinPoint.getSignature().getDeclaringTypeName());
+		log.info("Método Acessado :  " + joinPoint.getSignature().getName());
+		log.info("Nome da Classe :  " + joinPoint.getSignature().getDeclaringTypeName());
 		//log.info("Arguments [{}]", joinPoint.getArgs()[0]);
-		log.info("Arguments " + Arrays.toString(joinPoint.getArgs()));
-		log.info("Target class : " + joinPoint.getTarget().getClass().getName());
+		log.info("Argumentos : " + Arrays.toString(joinPoint.getArgs()));
+		log.info("Classe Alvo : " + joinPoint.getTarget().getClass().getName());
 
 		if (null != request) {
-			log.info("Start Header Section of request ");
-			log.info("Method Type : " + request.getMethod());
+			log.info("Início Header da Requisição ");
+			log.info("Tipo de Requisição : " + request.getMethod());
 			Enumeration<String> headerNames = request.getHeaderNames();
 			while (headerNames.hasMoreElements()) {
 				String headerName = headerNames.nextElement();
 				String headerValue = request.getHeader(headerName);
-				log.info("Header Name: " + headerName + " Header Value : " + headerValue);
+				log.info("Nome do Header: " + headerName + " Valor do Header : " + headerValue);
 			}
-			log.info("Request Path info :" + request.getServletPath());
-			log.info("End Header Section of request ");
+			log.info("Path de Requisição :" + request.getServletPath());
+			log.info("Fim Header da Requisição ");
 		}
 	}
 	
 	@AfterReturning(pointcut = "restController() && allMethod()", returning = "result")
 	public void logAfter(JoinPoint joinPoint, Object result) {
 		String returnValue = this.getValue(result);
-		log.info("Method Return value : " + returnValue);
+		log.info("Retorno do Método : " + returnValue);
 	}
 	
 	@AfterThrowing(pointcut = "restController() && allMethod()", throwing = "exception")
 	public void logAfterThrowing(JoinPoint joinPoint, Throwable exception) {
-		log.error("An exception has been thrown in " + joinPoint.getSignature().getName() + " ()");
-		log.error("Cause : " + exception.getCause());
+		log.error("Exceção Lançada em " + joinPoint.getSignature().getName() + " ()");
+		log.error("Causa : " + exception.getCause());
 	}
 	
 	@Around("restController() && allMethod()")
@@ -88,12 +84,12 @@ public class ApectManagerAPI {
 			String methodName = joinPoint.getSignature().getName();
 			Object result = joinPoint.proceed();
 			long elapsedTime = System.currentTimeMillis() - start;
-			log.info("Method " + className + "." + methodName + " ()" + " execution time : "
+			log.info("Método " + className + "." + methodName + " ()" + " Executado Em : "
 					+ elapsedTime + " ms");
 		
 			return result;
 		} catch (IllegalArgumentException e) {
-			log.error("Illegal argument " + Arrays.toString(joinPoint.getArgs()) + " in "
+			log.error("Argumento Ilegal " + Arrays.toString(joinPoint.getArgs()) + " Em : "
 					+ joinPoint.getSignature().getName() + "()");
 			throw e;
 		}
