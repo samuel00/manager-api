@@ -22,9 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import sml.manager.api.core.entidade.FilmeDTO;
 
-/**
- * Handles requests for the application home page.
- */
 @RestController
 @RequestMapping("/filme")
 public class FilmeController {

@@ -1,6 +1,7 @@
 package sml.manager.api.aspect;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,13 +17,27 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import sml.manager.api.aspect.modelo.Parametro;
+import sml.manager.api.aspect.modelo.Requisicao;
+import sml.manager.api.aspect.service.TesteService;
 
 @Aspect
 @Component
 public class ApectManagerAPI {
-
+	
+	private TesteService testeService;
+	
 	Logger log = LoggerFactory.getLogger(this.getClass());
+	private Requisicao requisicao;
+	private Parametro parametro;
+
 
 	@Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
 	public void restController() {
@@ -42,7 +57,7 @@ public class ApectManagerAPI {
 	
 	@Before("restController() && allMethod() && args(..,request)")
 	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) {
-
+		
 		log.info("Método Acessado :  " + joinPoint.getSignature().getName());
 		log.info("Nome da Classe :  " + joinPoint.getSignature().getDeclaringTypeName());
 		//log.info("Arguments [{}]", joinPoint.getArgs()[0]);
@@ -52,6 +67,7 @@ public class ApectManagerAPI {
 		if (null != request) {
 			log.info("Início Header da Requisição ");
 			log.info("Tipo de Requisição : " + request.getMethod());
+			log.info("IP : " + request.getRemoteAddr());
 			Enumeration<String> headerNames = request.getHeaderNames();
 			while (headerNames.hasMoreElements()) {
 				String headerName = headerNames.nextElement();
@@ -61,12 +77,27 @@ public class ApectManagerAPI {
 			log.info("Path de Requisição :" + request.getServletPath());
 			log.info("Fim Header da Requisição ");
 		}
+		
+		requisicao = new Requisicao();
+		parametro = new Parametro();
+		requisicao.setData(Calendar.getInstance());
+		requisicao.setIpOrigem(request.getRemoteAddr());
+		requisicao.setTipo(request.getMethod());
+		
+		parametro.setEntrada(joinPoint.getArgs()[0].toString());
+		parametro.setMetodoInvocado(joinPoint.getSignature().getName());
+		parametro.setClasseInvocada(joinPoint.getTarget().getClass().getName());
+		
 	}
 	
 	@AfterReturning(pointcut = "restController() && allMethod()", returning = "result")
 	public void logAfter(JoinPoint joinPoint, Object result) {
 		String returnValue = this.getValue(result);
 		log.info("Retorno do Método : " + returnValue);
+		parametro.setSaida(returnValue);
+		parametro.setRequisicao(requisicao);
+		requisicao.setParametro(parametro);
+		testeService.persistirAluno(requisicao);
 	}
 	
 	@AfterThrowing(pointcut = "restController() && allMethod()", throwing = "exception")
@@ -86,7 +117,7 @@ public class ApectManagerAPI {
 			long elapsedTime = System.currentTimeMillis() - start;
 			log.info("Método " + className + "." + methodName + " ()" + " Executado Em : "
 					+ elapsedTime + " ms");
-		
+			requisicao.setTempoExecucao(elapsedTime);
 			return result;
 		} catch (IllegalArgumentException e) {
 			log.error("Argumento Ilegal " + Arrays.toString(joinPoint.getArgs()) + " Em : "
@@ -104,4 +135,11 @@ public class ApectManagerAPI {
 		}
 		return returnValue;
 	}
+	
+	@Autowired(required=true)
+	@Qualifier(value="testeService")
+	public void setTesteService(TesteService testeService) {
+		this.testeService = testeService;
+	}
+
 }
