@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import sml.manager.api.core.entidade.FilmeDTO;
+import sml.manager.api.core.entidade.LaboratorioDTO;
 
 @RestController
-@RequestMapping("/filme")
-public class FilmeController {
+@RequestMapping("/laboratorio")
+public class LaboratorioController {
 
-	private static final Logger logger = LoggerFactory.getLogger(FilmeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(LaboratorioController.class);
 
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String salvarFilme(@RequestBody @Validated FilmeDTO filme,
+	public String salvarLaboratorio(@RequestBody @Validated LaboratorioDTO laboratorio,
 			HttpServletRequest request)  throws ParseException {
 
 		JSONObject json = new JSONObject();
@@ -44,13 +44,14 @@ public class FilmeController {
 	}
 
 	@RequestMapping(value = "/id", method = RequestMethod.GET)
-	public String getFilme(@RequestParam(value = "id", required = false) String id, HttpServletRequest request) {
+	public String getLaboratório(@RequestParam(value = "id", required = false) String id, HttpServletRequest request) {
 
 		JSONObject json = new JSONObject();
 		
-		json.put("titulo", "Mestrado: a Batalha Final");
-		json.put("ano", 2016);
-		json.put("genero", "Drama");
+		json.put("nome", "ITEC");
+		json.put("area", "Tecnologia da Informacao");
+		json.put("professorResponsavel", "Prof. Dr. Ari Estotolis");
+
 
 		return json.toString();
 	}
