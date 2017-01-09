@@ -1,5 +1,7 @@
 package sml.manager.api.aspect;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -56,7 +58,7 @@ public class ApectManagerAPI {
 	}
 	
 	@Before("restController() && allMethod() && args(..,request)")
-	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) {
+	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) throws ParseException {
 		
 		log.info("Método Acessado :  " + joinPoint.getSignature().getName());
 		log.info("Nome da Classe :  " + joinPoint.getSignature().getDeclaringTypeName());
@@ -80,7 +82,11 @@ public class ApectManagerAPI {
 		
 		requisicao = new Requisicao();
 		parametro = new Parametro();
-		requisicao.setData(Calendar.getInstance());
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+		String formatted = format1.format(cal.getTime());
+		cal.setTime(format1.parse(formatted));
+		requisicao.setData(cal);
 		requisicao.setIpOrigem(request.getRemoteAddr());
 		requisicao.setTipo(request.getMethod());
 		
