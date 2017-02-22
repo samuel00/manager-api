@@ -1,5 +1,6 @@
 package sml.manager.api.aspect;
 
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import sml.manager.api.aspect.modelo.Parametro;
 import sml.manager.api.aspect.modelo.Requisicao;
@@ -58,8 +66,7 @@ public class ApectManagerAPI {
 	}
 	
 	@Before("restController() && allMethod() && args(..,request)")
-	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) throws ParseException {
-		
+	public void logBefore(JoinPoint joinPoint, HttpServletRequest request) throws ParseException, JsonProcessingException {
 		log.info("Método Acessado :  " + joinPoint.getSignature().getName());
 		log.info("Nome da Classe :  " + joinPoint.getSignature().getDeclaringTypeName());
 		//log.info("Arguments [{}]", joinPoint.getArgs()[0]);
@@ -89,8 +96,9 @@ public class ApectManagerAPI {
 		requisicao.setData(cal);
 		requisicao.setIpOrigem(request.getRemoteAddr());
 		requisicao.setTipo(request.getMethod());
-		
-		parametro.setEntrada(joinPoint.getArgs()[0].toString());
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		String json = ow.writeValueAsString(joinPoint.getArgs()[0]);
+		parametro.setEntrada(json.toString());
 		parametro.setMetodoInvocado(joinPoint.getSignature().getName());
 		parametro.setClasseInvocada(joinPoint.getTarget().getClass().getName());
 		

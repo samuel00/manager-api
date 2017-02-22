@@ -45,7 +45,7 @@ public class LaboratorioController {
 
 	@RequestMapping(value = "/id", method = RequestMethod.GET)
 	public String getLaboratório(@RequestParam(value = "id", required = false) String id, HttpServletRequest request) {
-
+		
 		JSONObject json = new JSONObject();
 		
 		json.put("nome", "ITEC");
